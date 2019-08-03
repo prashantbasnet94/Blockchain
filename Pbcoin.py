@@ -104,7 +104,7 @@ class Blockchain:
         max_length = len(self.chain);
         
         for nodes in network:
-            response = requests.get('http://{node}/get_chain')
+            response = requests.get(f'http://{node}/get_chain')
             if response.status_code ==200:
                length = response.json()['length'];
                chain =response.json()['chain']
@@ -129,6 +129,9 @@ class Blockchain:
 # Creating a Web App
 app = Flask(__name__)
 
+#CREATing an address for the node on port
+node_address=str(uuid4()).replace('-','')
+
 # Creating a Blockchain
 blockchain = Blockchain()
 
@@ -147,6 +150,7 @@ def mine_block():
     #we have new proof of work we want new hash, new hash will be generated from hash function with the parameter of previous block
     previous_hash = blockchain.hash(previous_block)
     
+    blockchain.add_transactions(sender=node_address,receiver='Prashant',amount=10)
     #new block is mined
     block = blockchain.create_block(proof, previous_hash)
     #following responce is returned as json
@@ -154,7 +158,9 @@ def mine_block():
                 'index': block['index'],
                 'timestamp': block['timestamp'],
                 'proof': block['proof'],
-                'previous_hash': block['previous_hash']}
+                'previous_hash': block['previous_hash'],
+                'transactions':block['transactions']
+                }
     return jsonify(response), 200
 
 # Getting the full Blockchain
@@ -173,6 +179,30 @@ def is_valid():
     else:
         response = {'message': 'Houston, we have a problem. The Blockchain is not valid.'}
     return jsonify(response), 200
+
+
+#Adding a new transaction to the blockchain
+@app.route('/add_transaction',methods=['POST'])
+def add_transaction():
+    json = request.get_json()
+    transaction_keys =['sender','receiver','amount']
+    if not all ( key in json for key in transaction_keys):
+        return 'some elements of the transaction are missing',400
+    index= blockchain.add_transactions(json['sender'], json['receiver'], json['amount'])
+    response= {'message':f'This transaction will be added to the Block{index}'}
+    return jsonify(response),201
+    
+    
+        
+    
+
+
+#Decentralizaing blockchian
+
+
+
+
+
 
 # Running the app
 app.run(host = '0.0.0.0', port = 5000)
