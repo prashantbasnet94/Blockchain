@@ -150,7 +150,7 @@ def mine_block():
     #we have new proof of work we want new hash, new hash will be generated from hash function with the parameter of previous block
     previous_hash = blockchain.hash(previous_block)
     
-    blockchain.add_transactions(sender=node_address,receiver='Prashant',amount=10)
+    blockchain.add_transactions(sender=node_address,receiver='Bishwo',amount=10)
     #new block is mined
     block = blockchain.create_block(proof, previous_hash)
     #following responce is returned as json
@@ -234,4 +234,4 @@ def replace_chain():
 
 
 # Running the app
-app.run(host = '0.0.0.0', port = 5000)
+app.run(host = '0.0.0.0', port = 5002)

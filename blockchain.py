@@ -8,42 +8,27 @@
 import datetime
 import hashlib
 import json
-from flask import Flask, jsonify, request
-import requests
-from uuid import uuid4
-from urllib.parse import urlparse
-
+from flask import Flask, jsonify
 
 # Part 1 - Building a Blockchain
 
 class Blockchain:
 
     def __init__(self):
-         self.chain = []
-         self.transactions=[]
-         #chain is created
-         print(self.chain)
-        #A block is created when the program boots
-         print(self.create_block(proof = 1, previous_hash = '0'))
-         
-         print(self.get_previous_block)
-    #method is called when create_block is called
+        self.chain = []
+        self.create_block(proof = 1, previous_hash = '0')
+
     def create_block(self, proof, previous_hash):
         block = {'index': len(self.chain) + 1,
                  'timestamp': str(datetime.datetime.now()),
                  'proof': proof,
-                 'previous_hash': previous_hash,
-                 'transactions':self.transactions
-                 }
-        self.transactions=[]
+                 'previous_hash': previous_hash}
         self.chain.append(block)
         return block
 
-#Negative numbers mean that you count from the right instead of the left. So, list[-1] refers to the last element, list[-2] is the second-last, and so on.
     def get_previous_block(self):
         return self.chain[-1]
 
-    #this is required for creating new block
     def proof_of_work(self, previous_proof):
         new_proof = 1
         check_proof = False
@@ -55,7 +40,6 @@ class Blockchain:
                 new_proof += 1
         return new_proof
     
-    #some kind of hash is calculated below
     def hash(self, block):
         encoded_block = json.dumps(block, sort_keys = True).encode()
         return hashlib.sha256(encoded_block).hexdigest()
@@ -87,21 +71,11 @@ blockchain = Blockchain()
 # Mining a new block
 @app.route('/mine_block', methods = ['GET'])
 def mine_block():
-    
-    #this will give me previous block
     previous_block = blockchain.get_previous_block()
-    #this will go inside the previous  block array and then grab the property 'proof' which is basically 1
     previous_proof = previous_block['proof']
-   
-    #now we have previous block and previous proof we can create new proof of work using previous proof of work
     proof = blockchain.proof_of_work(previous_proof)
-    
-    #we have new proof of work we want new hash, new hash will be generated from hash function with the parameter of previous block
     previous_hash = blockchain.hash(previous_block)
-    
-    #new block is mined
     block = blockchain.create_block(proof, previous_hash)
-    #following responce is returned as json
     response = {'message': 'Congratulations, you just mined a block!',
                 'index': block['index'],
                 'timestamp': block['timestamp'],
