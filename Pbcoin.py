@@ -46,6 +46,8 @@ class Blockchain:
         self.transactions=[]
         self.chain.append(block)
         return block
+    
+    
 
 #Negative numbers mean that you count from the right instead of the left. So, list[-1] refers to the last element, list[-2] is the second-last, and so on.
     def get_previous_block(self):
@@ -83,6 +85,15 @@ class Blockchain:
             previous_block = block
             block_index += 1
         return True
+    
+    def add_transactions(self, sender, receiver, amount):
+        self.transactions.append({
+                'sender':sender,
+                'receiver':receiver,
+                'amount':amount
+                })
+        previous_block= self.get_previous_block();
+        return previous_block['index']+1;
 
 # Part 2 - Mining our Blockchain
 
